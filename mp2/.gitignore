@@ -55,3 +55,29 @@ docs/_build/
 
 # PyBuilder
 target/
+/OrphanPages$LinkCountMap.class
+/OrphanPages$OrphanPageReduce.class
+/OrphanPages.class
+/Pair.class
+/PopularityLeague.class
+/TitleCount$TitleCountMap.class
+/TitleCount$TitleCountReduce.class
+/TitleCount.class
+/TopPopularLinks$IntArrayWritable.class
+/TopPopularLinks$LinkCountMap.class
+/TopPopularLinks$LinkCountReduce.class
+/TopPopularLinks$TopLinksMap.class
+/TopPopularLinks$TopLinksReduce.class
+/TopPopularLinks.class
+/TopTitleStatistics$TextArrayWritable.class
+/TopTitleStatistics$TitleCountMap.class
+/TopTitleStatistics$TitleCountReduce.class
+/TopTitleStatistics$TopTitlesStatMap.class
+/TopTitleStatistics$TopTitlesStatReduce.class
+/TopTitleStatistics.class
+/TopTitles$TextArrayWritable.class
+/TopTitles$TitleCountMap.class
+/TopTitles$TitleCountReduce.class
+/TopTitles$TopTitlesMap.class
+/TopTitles$TopTitlesReduce.class
+/TopTitles.class
