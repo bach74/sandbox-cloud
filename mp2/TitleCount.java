@@ -86,9 +86,9 @@ public class TitleCount extends Configured implements Tool {
 			String line = value.toString();
 			StringTokenizer tokenizer = new StringTokenizer(line, this.delimiters);
 			while (tokenizer.hasMoreTokens()) {
-				String token = tokenizer.nextToken();
-				if (!stopWords.contains(token.trim().toLowerCase())) {
-					context.write(new Text(token), new IntWritable(1));
+				String nextToken = tokenizer.nextToken();
+				if (!stopWords.contains(nextToken.trim().toLowerCase())) {
+					context.write(new Text(nextToken), new IntWritable(1));
 				}
 			}
 		}
@@ -98,8 +98,8 @@ public class TitleCount extends Configured implements Tool {
 		@Override
 		public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
 			int sum = 0;
-			for (IntWritable value : values) {
-				sum += value.get();
+			for (IntWritable val : values) {
+				sum += val.get();
 			}
 			context.write(key, new IntWritable(sum));
 		}
