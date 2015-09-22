@@ -28,205 +28,261 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 // >>> Don't Change
-public class TopTitles extends Configured implements Tool {
+public class TopTitles extends Configured implements Tool
+{
 
-    public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Configuration(), new TopTitles(), args);
-        System.exit(res);
-    }
+	public static void main(String[] args) throws Exception
+	{
+		int res = ToolRunner.run(new Configuration(), new TopTitles(), args);
+		System.exit(res);
+	}
 
-    @Override
-    public int run(String[] args) throws Exception {
-        Configuration conf = this.getConf();
-        FileSystem fs = FileSystem.get(conf);
-        Path tmpPath = new Path("/mp2/tmp");
-        fs.delete(tmpPath, true);
+	@Override
+	public int run(String[] args) throws Exception
+	{
+		Configuration conf = this.getConf();
+		FileSystem fs = FileSystem.get(conf);
+		Path tmpPath = new Path("/mp2/tmp");
+		fs.delete(tmpPath, true);
 
-        Job jobA = Job.getInstance(conf, "Title Count");
-        jobA.setOutputKeyClass(Text.class);
-        jobA.setOutputValueClass(IntWritable.class);
+		Job jobA = Job.getInstance(conf, "Title Count");
+		jobA.setOutputKeyClass(Text.class);
+		jobA.setOutputValueClass(IntWritable.class);
 
-        jobA.setMapperClass(TitleCountMap.class);
-        jobA.setReducerClass(TitleCountReduce.class);
+		jobA.setMapperClass(TitleCountMap.class);
+		jobA.setReducerClass(TitleCountReduce.class);
 
-        FileInputFormat.setInputPaths(jobA, new Path(args[0]));
-        FileOutputFormat.setOutputPath(jobA, tmpPath);
+		FileInputFormat.setInputPaths(jobA, new Path(args[0]));
+		FileOutputFormat.setOutputPath(jobA, tmpPath);
 
-        jobA.setJarByClass(TopTitles.class);
-        jobA.waitForCompletion(true);
+		jobA.setJarByClass(TopTitles.class);
+		jobA.waitForCompletion(true);
 
-        Job jobB = Job.getInstance(conf, "Top Titles");
-        jobB.setOutputKeyClass(Text.class);
-        jobB.setOutputValueClass(IntWritable.class);
+		Job jobB = Job.getInstance(conf, "Top Titles");
+		jobB.setOutputKeyClass(Text.class);
+		jobB.setOutputValueClass(IntWritable.class);
 
-        jobB.setMapOutputKeyClass(NullWritable.class);
-        jobB.setMapOutputValueClass(TextArrayWritable.class);
+		jobB.setMapOutputKeyClass(NullWritable.class);
+		jobB.setMapOutputValueClass(TextArrayWritable.class);
 
-        jobB.setMapperClass(TopTitlesMap.class);
-        jobB.setReducerClass(TopTitlesReduce.class);
-        jobB.setNumReduceTasks(1);
+		jobB.setMapperClass(TopTitlesMap.class);
+		jobB.setReducerClass(TopTitlesReduce.class);
+		jobB.setNumReduceTasks(1);
 
-        FileInputFormat.setInputPaths(jobB, tmpPath);
-        FileOutputFormat.setOutputPath(jobB, new Path(args[1]));
+		FileInputFormat.setInputPaths(jobB, tmpPath);
+		FileOutputFormat.setOutputPath(jobB, new Path(args[1]));
 
-        jobB.setInputFormatClass(KeyValueTextInputFormat.class);
-        jobB.setOutputFormatClass(TextOutputFormat.class);
+		jobB.setInputFormatClass(KeyValueTextInputFormat.class);
+		jobB.setOutputFormatClass(TextOutputFormat.class);
 
-        jobB.setJarByClass(TopTitles.class);
-        return jobB.waitForCompletion(true) ? 0 : 1;
-    }
+		jobB.setJarByClass(TopTitles.class);
+		return jobB.waitForCompletion(true) ? 0 : 1;
+	}
 
-    public static String readHDFSFile(String path, Configuration conf) throws IOException{
-        Path pt=new Path(path);
-        FileSystem fs = FileSystem.get(pt.toUri(), conf);
-        FSDataInputStream file = fs.open(pt);
-        BufferedReader buffIn=new BufferedReader(new InputStreamReader(file));
+	public static String readHDFSFile(String path, Configuration conf) throws IOException
+	{
+		Path pt = new Path(path);
+		FileSystem fs = FileSystem.get(pt.toUri(), conf);
+		FSDataInputStream file = fs.open(pt);
+		BufferedReader buffIn = new BufferedReader(new InputStreamReader(file));
 
-        StringBuilder everything = new StringBuilder();
-        String line;
-        while( (line = buffIn.readLine()) != null) {
-            everything.append(line);
-            everything.append("\n");
-        }
-        return everything.toString();
-    }
+		StringBuilder everything = new StringBuilder();
+		String line;
+		while ((line = buffIn.readLine()) != null) {
+			everything.append(line);
+			everything.append("\n");
+		}
+		return everything.toString();
+	}
 
-    public static class TextArrayWritable extends ArrayWritable {
-        public TextArrayWritable() {
-            super(Text.class);
-        }
+	public static class TextArrayWritable extends ArrayWritable
+	{
+		public TextArrayWritable()
+		{
+			super(Text.class);
+		}
 
-        public TextArrayWritable(String[] strings) {
-            super(Text.class);
-            Text[] texts = new Text[strings.length];
-            for (int i = 0; i < strings.length; i++) {
-                texts[i] = new Text(strings[i]);
-            }
-            set(texts);
-        }
-    }
-// <<< Don't Change
+		public TextArrayWritable(String[] strings)
+		{
+			super(Text.class);
+			Text[] texts = new Text[strings.length];
+			for (int i = 0; i < strings.length; i++) {
+				texts[i] = new Text(strings[i]);
+			}
+			set(texts);
+		}
+	}
+	// <<< Don't Change
 
-    public static class TitleCountMap extends Mapper<Object, Text, Text, IntWritable> {
-        List<String> stopWords;
-        String delimiters;
+	public static class TitleCountMap extends Mapper<Object, Text, Text, IntWritable>
+	{
+		List<String> stopWords;
+		String delimiters;
 
-        @Override
-        protected void setup(Context context) throws IOException,InterruptedException {
+		@Override
+		protected void setup(Context context) throws IOException, InterruptedException
+		{
 
-            Configuration conf = context.getConfiguration();
+			Configuration conf = context.getConfiguration();
 
-            String stopWordsPath = conf.get("stopwords");
-            String delimitersPath = conf.get("delimiters");
+			String stopWordsPath = conf.get("stopwords");
+			String delimitersPath = conf.get("delimiters");
 
-            this.stopWords = Arrays.asList(readHDFSFile(stopWordsPath, conf).split("\n"));
-            this.delimiters = readHDFSFile(delimitersPath, conf);
-        }
+			this.stopWords = Arrays.asList(readHDFSFile(stopWordsPath, conf).split("\n"));
+			this.delimiters = readHDFSFile(delimitersPath, conf);
+		}
 
+		@Override
+		public void map(Object key, Text value, Context context) throws IOException, InterruptedException
+		{
+			String line = value.toString();
+			StringTokenizer tokenizer = new StringTokenizer(line, this.delimiters);
+			while (tokenizer.hasMoreTokens()) {
+				String token = tokenizer.nextToken().toLowerCase().trim();
+				if (!stopWords.contains(token)) {
+					context.write(new Text(token), new IntWritable(1));
+				}
+			}
+		}
+	}
 
-        @Override
-        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-        // TODO
-        }
-    }
+	public static class TitleCountReduce extends Reducer<Text, IntWritable, Text, IntWritable>
+	{
+		@Override
+		public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException
+		{
+			int sum = 0;
+			for (IntWritable val : values) {
+				sum += val.get();
+			}
+			context.write(key, new IntWritable(sum));
+		}
+	}
 
-    public static class TitleCountReduce extends Reducer<Text, IntWritable, Text, IntWritable> {
-        @Override
-        public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
-            // TODO
-        }
-    }
+	public static class TopTitlesMap extends Mapper<Text, Text, NullWritable, TextArrayWritable>
+	{
+		Integer N;
+		private TreeSet<Pair<Integer, String>> countToWordMap = new TreeSet<Pair<Integer, String>>();
 
-    public static class TopTitlesMap extends Mapper<Text, Text, NullWritable, TextArrayWritable> {
-        Integer N;
-        // TODO
+		@Override
+		protected void setup(Context context) throws IOException, InterruptedException
+		{
+			Configuration conf = context.getConfiguration();
+			this.N = conf.getInt("N", 10);
+		}
 
-        @Override
-        protected void setup(Context context) throws IOException,InterruptedException {
-            Configuration conf = context.getConfiguration();
-            this.N = conf.getInt("N", 10);
-        }
+		@Override
+		public void map(Text key, Text value, Context context) throws IOException, InterruptedException
+		{
+			Integer count = Integer.parse(value.toString());
+			String word = key.toString();
 
-        @Override
-        public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
-            // TODO
-        }
+			countToWordMap.add(new Pair<Integer, String>(count, word));
 
-        @Override
-        protected void cleanup(Context context) throws IOException, InterruptedException {
-            // TODO
-        }
-    }
+			if (countToWordMap.size() > N) {
+				countToWordMap.remove(countToWordMap.first());
+			}
+		}
 
-    public static class TopTitlesReduce extends Reducer<NullWritable, TextArrayWritable, Text, IntWritable> {
-        Integer N;
-        // TODO
+		@Override
+		protected void cleanup(Context context) throws IOException, InterruptedException
+		{
+			for (Pair<Integer, String> element : countToWordMap) {
+				context.write(NullWritable.get(), new TextArrayWritable(new String[] { element.second, element.first.toString() }));
+			}
+		}
+	}
 
-        @Override
-        protected void setup(Context context) throws IOException,InterruptedException {
-            Configuration conf = context.getConfiguration();
-            this.N = conf.getInt("N", 10);
-        }
+	public static class TopTitlesReduce extends Reducer<NullWritable, TextArrayWritable, Text, IntWritable>
+	{
+		Integer N;
+		private TreeSet<Pair<Integer, String>> countToWordMap = new TreeSet<Pair<Integer, String>>();
 
-        @Override
-        public void reduce(NullWritable key, Iterable<TextArrayWritable> values, Context context) throws IOException, InterruptedException {
-            // TODO
-        }
-    }
+		@Override
+		protected void setup(Context context) throws IOException, InterruptedException
+		{
+			Configuration conf = context.getConfiguration();
+			this.N = conf.getInt("N", 10);
+		}
+
+		@Override
+		public void reduce(NullWritable key, Iterable<TextArrayWritable> values, Context context) throws IOException, InterruptedException
+		{
+			for (TextArrayWritable value : values) {
+				Text[] pair = (Text[]) value.toArray();
+				String word = pair[0].toString();
+				Integer count = Integer.parseInt(pair[1].toString());
+
+				countToWordMap.add(new Pair<Integer, String>(count, word));
+
+				if (countToWordMap.size() > 10) {
+					countToWordMap.remove(countToWordMap.first());
+				}
+
+				for (Pair<Integer, String> item : countToWordMap) {
+					context.write(new Text(item.second), new IntWritable(item.first));
+				}
+			}
+		}
+	}
 
 }
 
 // >>> Don't Change
-class Pair<A extends Comparable<? super A>,
-        B extends Comparable<? super B>>
-        implements Comparable<Pair<A, B>> {
+class Pair<A extends Comparable<? super A>, B extends Comparable<? super B>> implements Comparable<Pair<A, B>>
+{
 
-    public final A first;
-    public final B second;
+	public final A first;
+	public final B second;
 
-    public Pair(A first, B second) {
-        this.first = first;
-        this.second = second;
-    }
+	public Pair(A first, B second)
+	{
+		this.first = first;
+		this.second = second;
+	}
 
-    public static <A extends Comparable<? super A>,
-            B extends Comparable<? super B>>
-    Pair<A, B> of(A first, B second) {
-        return new Pair<A, B>(first, second);
-    }
+	public static <A extends Comparable<? super A>, B extends Comparable<? super B>> Pair<A, B> of(A first, B second)
+	{
+		return new Pair<A, B>(first, second);
+	}
 
-    @Override
-    public int compareTo(Pair<A, B> o) {
-        int cmp = o == null ? 1 : (this.first).compareTo(o.first);
-        return cmp == 0 ? (this.second).compareTo(o.second) : cmp;
-    }
+	@Override
+	public int compareTo(Pair<A, B> o)
+	{
+		int cmp = o == null ? 1 : (this.first).compareTo(o.first);
+		return cmp == 0 ? (this.second).compareTo(o.second) : cmp;
+	}
 
-    @Override
-    public int hashCode() {
-        return 31 * hashcode(first) + hashcode(second);
-    }
+	@Override
+	public int hashCode()
+	{
+		return 31 * hashcode(first) + hashcode(second);
+	}
 
-    private static int hashcode(Object o) {
-        return o == null ? 0 : o.hashCode();
-    }
+	private static int hashcode(Object o)
+	{
+		return o == null ? 0 : o.hashCode();
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Pair))
-            return false;
-        if (this == obj)
-            return true;
-        return equal(first, ((Pair<?, ?>) obj).first)
-                && equal(second, ((Pair<?, ?>) obj).second);
-    }
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (!(obj instanceof Pair))
+			return false;
+		if (this == obj)
+			return true;
+		return equal(first, ((Pair<?, ?>) obj).first) && equal(second, ((Pair<?, ?>) obj).second);
+	}
 
-    private boolean equal(Object o1, Object o2) {
-        return o1 == o2 || (o1 != null && o1.equals(o2));
-    }
+	private boolean equal(Object o1, Object o2)
+	{
+		return o1 == o2 || (o1 != null && o1.equals(o2));
+	}
 
-    @Override
-    public String toString() {
-        return "(" + first + ", " + second + ')';
-    }
+	@Override
+	public String toString()
+	{
+		return "(" + first + ", " + second + ')';
+	}
 }
 // <<< Don't Change
