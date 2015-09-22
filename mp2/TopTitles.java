@@ -206,26 +206,24 @@ public class TopTitles extends Configured implements Tool
 		}
 
 		@Override
-        public void reduce(NullWritable key, Iterable<TextArrayWritable> values, Context context) throws IOException, InterruptedException {
-            for (TextArrayWritable val: values) {
-                Text[] pair= (Text[]) val.toArray();
+		public void reduce(NullWritable key, Iterable<TextArrayWritable> values, Context context) throws IOException, InterruptedException
+		{
+			for (TextArrayWritable value : values) {
+				Text[] pair = (Text[]) value.toArray();
+				String word = pair[0].toString();
+				Integer count = Integer.parseInt(pair[1].toString());
 
-                String word = pair[0].toString();
-                Integer count = Integer.parseInt(pair[1].toString());
+				countToWordMap.add(new Pair<Integer, String>(count, word));
 
-                countToWordMap.add(new Pair<Integer, String>(count, word));
+				if (countToWordMap.size() > N) {
+					countToWordMap.remove(countToWordMap.first());
+				}
 
-                if (countToWordMap.size() > 10) {
-                    countToWordMap.remove(countToWordMap.first());
-                }
-            }
-
-            for (Pair<Integer, String> item: countToWordMap) {
-                Text word = new Text(item.second);
-                IntWritable value = new IntWritable(item.first);
-                context.write(word, value);
-            }
-        }
+				for (Pair<Integer, String> item : countToWordMap) {
+					context.write(new Text(item.second), new IntWritable(item.first));
+				}
+			}
+		}
 	}
 
 }
