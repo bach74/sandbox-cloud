@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
-import java.lang.Integer;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
@@ -175,7 +174,7 @@ public class TopTitles extends Configured implements Tool
 		@Override
 		public void map(Text key, Text value, Context context) throws IOException, InterruptedException
 		{
-			Integer count = Integer.parse(value.toString());
+			Integer count = Integer.parseInt(value.toString());
 			String word = key.toString();
 
 			countToWordMap.add(new Pair<Integer, String>(count, word));
