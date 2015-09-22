@@ -215,7 +215,7 @@ public class TopTitles extends Configured implements Tool
 
 				countToWordMap.add(new Pair<Integer, String>(count, word));
 
-				if (countToWordMap.size() > 10) {
+				if (countToWordMap.size() > N) {
 					countToWordMap.remove(countToWordMap.first());
 				}
 
