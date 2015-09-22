@@ -172,25 +172,25 @@ public class TopTitles extends Configured implements Tool
 		}
 
 		@Override
-        public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
-            Integer count = Integer.parseInt(value.toString());
-            String word = key.toString();
+		public void map(Text key, Text value, Context context) throws IOException, InterruptedException
+		{
+			Integer count = Integer.parseInt(value.toString());
+			String word = key.toString();
 
-            countToWordMap.add(new Pair<Integer, String>(count, word));
+			countToWordMap.add(new Pair<Integer, String>(count, word));
 
-            if (countToWordMap.size() > 10) {
-                countToWordMap.remove(countToWordMap.first());
-            }
-        }
+			if (countToWordMap.size() > N) {
+				countToWordMap.remove(countToWordMap.first());
+			}
+		}
 
 		@Override
-        protected void cleanup(Context context) throws IOException, InterruptedException {
-            for (Pair<Integer, String> item : countToWordMap) {
-                String[] strings = {item.second, item.first.toString()};
-                TextArrayWritable val = new TextArrayWritable(strings);
-                context.write(NullWritable.get(), val);
-            }
-        }
+		protected void cleanup(Context context) throws IOException, InterruptedException
+		{
+			for (Pair<Integer, String> element : countToWordMap) {
+				context.write(NullWritable.get(), new TextArrayWritable(new String[] { element.second, element.first.toString() }));
+			}
+		}
 	}
 
 	public static class TopTitlesReduce extends Reducer<NullWritable, TextArrayWritable, Text, IntWritable>
