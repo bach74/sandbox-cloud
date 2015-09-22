@@ -172,25 +172,25 @@ public class TopTitles extends Configured implements Tool
 		}
 
 		@Override
-		public void map(Text key, Text value, Context context) throws IOException, InterruptedException
-		{
-			Integer count = Integer.parseInt(value.toString());
-			String word = key.toString();
+        public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
+            Integer count = Integer.parseInt(value.toString());
+            String word = key.toString();
 
-			countToWordMap.add(new Pair<Integer, String>(count, word));
+            countToWordMap.add(new Pair<Integer, String>(count, word));
 
-			if (countToWordMap.size() > N) {
-				countToWordMap.remove(countToWordMap.first());
-			}
-		}
+            if (countToWordMap.size() > 10) {
+                countToWordMap.remove(countToWordMap.first());
+            }
+        }
 
 		@Override
-		protected void cleanup(Context context) throws IOException, InterruptedException
-		{
-			for (Pair<Integer, String> element : countToWordMap) {
-				context.write(NullWritable.get(), new TextArrayWritable(new String[] { element.second, element.first.toString() }));
-			}
-		}
+        protected void cleanup(Context context) throws IOException, InterruptedException {
+            for (Pair<Integer, String> item : countToWordMap) {
+                String[] strings = {item.second, item.first.toString()};
+                TextArrayWritable val = new TextArrayWritable(strings);
+                context.write(NullWritable.get(), val);
+            }
+        }
 	}
 
 	public static class TopTitlesReduce extends Reducer<NullWritable, TextArrayWritable, Text, IntWritable>
@@ -206,24 +206,26 @@ public class TopTitles extends Configured implements Tool
 		}
 
 		@Override
-		public void reduce(NullWritable key, Iterable<TextArrayWritable> values, Context context) throws IOException, InterruptedException
-		{
-			for (TextArrayWritable value : values) {
-				Text[] pair = (Text[]) value.toArray();
-				String word = pair[0].toString();
-				Integer count = Integer.parseInt(pair[1].toString());
+        public void reduce(NullWritable key, Iterable<TextArrayWritable> values, Context context) throws IOException, InterruptedException {
+            for (TextArrayWritable val: values) {
+                Text[] pair= (Text[]) val.toArray();
 
-				countToWordMap.add(new Pair<Integer, String>(count, word));
+                String word = pair[0].toString();
+                Integer count = Integer.parseInt(pair[1].toString());
 
-				if (countToWordMap.size() > N) {
-					countToWordMap.remove(countToWordMap.first());
-				}
+                countToWordMap.add(new Pair<Integer, String>(count, word));
 
-				for (Pair<Integer, String> item : countToWordMap) {
-					context.write(new Text(item.second), new IntWritable(item.first));
-				}
-			}
-		}
+                if (countToWordMap.size() > 10) {
+                    countToWordMap.remove(countToWordMap.first());
+                }
+            }
+
+            for (Pair<Integer, String> item: countToWordMap) {
+                Text word = new Text(item.second);
+                IntWritable value = new IntWritable(item.first);
+                context.write(word, value);
+            }
+        }
 	}
 
 }
