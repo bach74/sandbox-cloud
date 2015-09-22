@@ -218,10 +218,10 @@ public class TopTitles extends Configured implements Tool
 				if (countToWordMap.size() > N) {
 					countToWordMap.remove(countToWordMap.first());
 				}
-
-				for (Pair<Integer, String> item : countToWordMap) {
-					context.write(new Text(item.second), new IntWritable(item.first));
-				}
+			}
+			
+			for (Pair<Integer, String> item : countToWordMap) {
+				context.write(new Text(item.second), new IntWritable(item.first));
 			}
 		}
 	}

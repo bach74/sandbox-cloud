@@ -23,14 +23,17 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 // >>> Don't Change
-public class TitleCount extends Configured implements Tool {
-	public static void main(String[] args) throws Exception {
+public class TitleCount extends Configured implements Tool
+{
+	public static void main(String[] args) throws Exception
+	{
 		int res = ToolRunner.run(new Configuration(), new TitleCount(), args);
 		System.exit(res);
 	}
 
 	@Override
-	public int run(String[] args) throws Exception {
+	public int run(String[] args) throws Exception
+	{
 		Job job = Job.getInstance(this.getConf(), "Title Count");
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
@@ -48,7 +51,8 @@ public class TitleCount extends Configured implements Tool {
 		return job.waitForCompletion(true) ? 0 : 1;
 	}
 
-	public static String readHDFSFile(String path, Configuration conf) throws IOException {
+	public static String readHDFSFile(String path, Configuration conf) throws IOException
+	{
 		Path pt = new Path(path);
 		FileSystem fs = FileSystem.get(pt.toUri(), conf);
 		FSDataInputStream file = fs.open(pt);
@@ -65,12 +69,14 @@ public class TitleCount extends Configured implements Tool {
 
 	// <<< Don't Change
 
-	public static class TitleCountMap extends Mapper<Object, Text, Text, IntWritable> {
+	public static class TitleCountMap extends Mapper<Object, Text, Text, IntWritable>
+	{
 		List<String> stopWords;
 		String delimiters;
 
 		@Override
-		protected void setup(Context context) throws IOException, InterruptedException {
+		protected void setup(Context context) throws IOException, InterruptedException
+		{
 
 			Configuration conf = context.getConfiguration();
 
@@ -82,7 +88,8 @@ public class TitleCount extends Configured implements Tool {
 		}
 
 		@Override
-		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+		public void map(Object key, Text value, Context context) throws IOException, InterruptedException
+		{
 			String line = value.toString();
 			StringTokenizer tokenizer = new StringTokenizer(line, this.delimiters);
 			while (tokenizer.hasMoreTokens()) {
@@ -94,9 +101,11 @@ public class TitleCount extends Configured implements Tool {
 		}
 	}
 
-	public static class TitleCountReduce extends Reducer<Text, IntWritable, Text, IntWritable> {
+	public static class TitleCountReduce extends Reducer<Text, IntWritable, Text, IntWritable>
+	{
 		@Override
-		public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+		public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException
+		{
 			int sum = 0;
 			for (IntWritable val : values) {
 				sum += val.get();
