@@ -91,8 +91,8 @@ public class TopPopularLinks extends Configured implements Tool
 		FileInputFormat.setInputPaths(jobB, tmpPath);
 		FileOutputFormat.setOutputPath(jobB, new Path(args[1]));
 
-		jobB.setInputFormatClass(KeyValueTextInputFormat.class);
-		jobB.setOutputFormatClass(TextOutputFormat.class);
+	//	jobB.setInputFormatClass(KeyValueTextInputFormat.class);
+	//	jobB.setOutputFormatClass(TextOutputFormat.class);
 
 		return jobB.waitForCompletion(true) ? 0 : 1;
 
@@ -182,15 +182,15 @@ public class TopPopularLinks extends Configured implements Tool
 			for (IntArrayWritable value : values) {
 				Integer[] pair = (Integer[]) value.toArray();
 
-				linkToPage.add(new Pair<Integer, Integer>(pair));
+				linksToPage.add(new Pair<Integer, Integer>(pair[0], pair[1]));
 
-				if (linkToPage.size() > N) {
-					linkToPage.remove(linkToPage.first());
+				if (linksToPage.size() > N) {
+					linksToPage.remove(linksToPage.first());
 				}
 			}
 
-			for (Pair<Integer, Integer> pair : linkToPage) {
-				context.write(new IntWritable(pair.second), new IntWritable(pair.first));
+			for (Pair<Integer, Integer> link : linksToPage) {
+				context.write(new IntWritable(link.second), new IntWritable(link.first));
 			}
 
 		}
