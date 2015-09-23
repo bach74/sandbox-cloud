@@ -72,7 +72,7 @@ public class TopPopularLinks extends Configured implements Tool
 		jobA.setReducerClass(LinkCountReduce.class);
 
 		FileInputFormat.setInputPaths(jobA, new Path(args[0]));
-		FileInputFormat.setOutputPath(jobA, tmpPath);
+		FileOutputFormat.setOutputPath(jobA, tmpPath);
 
 		jobA.setJarByClass(OrphanPages.class);
 		jobA.waitForCompletion(true);
