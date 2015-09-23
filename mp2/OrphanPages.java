@@ -34,7 +34,7 @@ public class OrphanPages extends Configured implements Tool
 		job.setOutputValueClass(NullWritable.class);
 
 		job.setMapOutputKeyClass(IntWritable.class);
-		job.setMapValueClass(IntWritable.class);
+		job.setMapOutputValueClass(IntWritable.class);
 
 		job.setMapperClass(LinkCountMap.class);
 		job.setReducerClass(OrphanPageReduce.class);
@@ -59,7 +59,7 @@ public class OrphanPages extends Configured implements Tool
 				int link = Integer.parseInt(tokenizer.nextToken().trim());
 				context.write(new IntWritable(link), new IntWritable(1));
 			}
-			context.write(new IntWritable(key), new IntWritable(0));
+			context.write(new IntWritable(page), new IntWritable(0));
 		}
 	}
 
