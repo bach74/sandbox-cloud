@@ -77,7 +77,6 @@ public class TitleCount extends Configured implements Tool
 		@Override
 		protected void setup(Context context) throws IOException, InterruptedException
 		{
-
 			Configuration conf = context.getConfiguration();
 
 			String stopWordsPath = conf.get("stopwords");
