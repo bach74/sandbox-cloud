@@ -51,23 +51,6 @@ public class TopPopularLinks extends Configured implements Tool
 			set(ints);
 		}
 	}
-        public static class TextArrayWritable extends ArrayWritable
-    {
-        public TextArrayWritable()
-        {
-            super(Text.class);
-        }
-
-        public TextArrayWritable(String[] strings)
-        {
-            super(Text.class);
-            Text[] texts = new Text[strings.length];
-            for (int i = 0; i < strings.length; i++) {
-                texts[i] = new Text(strings[i]);
-            }
-            set(texts);
-        }
-    }
 	// <<< Don't Change
 
 	@Override
@@ -96,7 +79,7 @@ public class TopPopularLinks extends Configured implements Tool
 		jobB.setOutputValueClass(IntWritable.class);
 
 		jobB.setMapOutputKeyClass(NullWritable.class);
-		jobB.setMapOutputValueClass(TextArrayWritable.class);
+		jobB.setMapOutputValueClass(IntArrayWritable.class);
 
 		jobB.setMapperClass(TopLinksMap.class);
 		jobB.setReducerClass(TopLinksReduce.class);
@@ -143,7 +126,7 @@ public class TopPopularLinks extends Configured implements Tool
 		}
 	}
 
-	public static class TopLinksMap extends Mapper<Text, Text, NullWritable, TextArrayWritable>
+	public static class TopLinksMap extends Mapper<Text, Text, NullWritable, IntArrayWritable>
 	{
 		Integer N;
 
@@ -172,14 +155,14 @@ public class TopPopularLinks extends Configured implements Tool
 		@Override
 		protected void cleanup(Context context) throws IOException, InterruptedException
 		{
-			/*for (Pair<Integer, Integer> pair : linkToPage) {
+			for (Pair<Integer, Integer> pair : linkToPage) {
 				context.write(NullWritable.get(), new IntArrayWritable(new Integer[] { pair.first, pair.second }));
-			}*/
+			}
 		}
 
 	}
 
-	public static class TopLinksReduce extends Reducer<NullWritable, TextArrayWritable, IntWritable, IntWritable>
+	public static class TopLinksReduce extends Reducer<NullWritable, IntArrayWritable, IntWritable, IntWritable>
 	{
 		Integer N;
 
@@ -193,12 +176,12 @@ public class TopPopularLinks extends Configured implements Tool
 		}
 
 		@Override
-		public void reduce(NullWritable key, Iterable<TextArrayWritable> values, Context context) throws IOException, InterruptedException
+		public void reduce(NullWritable key, Iterable<IntArrayWritable> values, Context context) throws IOException, InterruptedException
 		{
-			/*for (TextArrayWritable value : values) {
-				Integer[] pair = (Integer[]) value.toArray();
+			for (IntArrayWritable value : values) {
+				IntWritable[] pair = (IntWritable[]) value.toArray();
 
-				linksToPage.add(new Pair<Integer, Integer>(pair[0], pair[1]));
+				linksToPage.add(new Pair<Integer, Integer>(pair[0].get(), pair[1].get()));
 
 				if (linksToPage.size() > N) {
 					linksToPage.remove(linksToPage.first());
@@ -208,7 +191,7 @@ public class TopPopularLinks extends Configured implements Tool
 			for (Pair<Integer, Integer> link : linksToPage) {
 				context.write(new IntWritable(link.second), new IntWritable(link.first));
 			}
-*/
+
 		}
 	}
 }
