@@ -143,7 +143,7 @@ public class TopPopularLinks extends Configured implements Tool
 		}
 	}
 
-	public static class TopLinksMap extends Mapper<Text, Text, NullWritable, IntArrayWritable>
+	public static class TopLinksMap extends Mapper<Text, Text, NullWritable, TextArrayWritable>
 	{
 		Integer N;
 
@@ -172,9 +172,9 @@ public class TopPopularLinks extends Configured implements Tool
 		@Override
 		protected void cleanup(Context context) throws IOException, InterruptedException
 		{
-			for (Pair<Integer, Integer> pair : linkToPage) {
+			/*for (Pair<Integer, Integer> pair : linkToPage) {
 				context.write(NullWritable.get(), new IntArrayWritable(new Integer[] { pair.first, pair.second }));
-			}
+			}*/
 		}
 
 	}
