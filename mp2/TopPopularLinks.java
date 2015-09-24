@@ -65,9 +65,6 @@ public class TopPopularLinks extends Configured implements Tool
 		jobA.setOutputKeyClass(IntWritable.class);
 		jobA.setOutputValueClass(IntWritable.class);
 
-		jobA.setMapOutputKeyClass(IntWritable.class);
-		jobA.setMapOutputValueClass(IntWritable.class);
-
 		jobA.setMapperClass(LinkCountMap.class);
 		jobA.setReducerClass(LinkCountReduce.class);
 
@@ -91,8 +88,8 @@ public class TopPopularLinks extends Configured implements Tool
 		FileInputFormat.setInputPaths(jobB, tmpPath);
 		FileOutputFormat.setOutputPath(jobB, new Path(args[1]));
 
-	//	jobB.setInputFormatClass(KeyValueTextInputFormat.class);
-	//	jobB.setOutputFormatClass(TextOutputFormat.class);
+		// jobB.setInputFormatClass(KeyValueTextInputFormat.class);
+		// jobB.setOutputFormatClass(TextOutputFormat.class);
 
 		return jobB.waitForCompletion(true) ? 0 : 1;
 
