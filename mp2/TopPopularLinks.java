@@ -51,6 +51,23 @@ public class TopPopularLinks extends Configured implements Tool
 			set(ints);
 		}
 	}
+        public static class TextArrayWritable extends ArrayWritable
+    {
+        public TextArrayWritable()
+        {
+            super(Text.class);
+        }
+
+        public TextArrayWritable(String[] strings)
+        {
+            super(Text.class);
+            Text[] texts = new Text[strings.length];
+            for (int i = 0; i < strings.length; i++) {
+                texts[i] = new Text(strings[i]);
+            }
+            set(texts);
+        }
+    }
 	// <<< Don't Change
 
 	@Override
