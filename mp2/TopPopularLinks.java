@@ -79,7 +79,7 @@ public class TopPopularLinks extends Configured implements Tool
 		jobB.setOutputValueClass(IntWritable.class);
 
 		jobB.setMapOutputKeyClass(NullWritable.class);
-		jobB.setMapOutputValueClass(IntArrayWritable.class);
+		jobB.setMapOutputValueClass(TextArrayWritable.class);
 
 		jobB.setMapperClass(TopLinksMap.class);
 		jobB.setReducerClass(TopLinksReduce.class);
@@ -162,7 +162,7 @@ public class TopPopularLinks extends Configured implements Tool
 
 	}
 
-	public static class TopLinksReduce extends Reducer<NullWritable, IntArrayWritable, IntWritable, IntWritable>
+	public static class TopLinksReduce extends Reducer<NullWritable, TextArrayWritable, IntWritable, IntWritable>
 	{
 		Integer N;
 
@@ -176,9 +176,9 @@ public class TopPopularLinks extends Configured implements Tool
 		}
 
 		@Override
-		public void reduce(NullWritable key, Iterable<IntArrayWritable> values, Context context) throws IOException, InterruptedException
+		public void reduce(NullWritable key, Iterable<TextArrayWritable> values, Context context) throws IOException, InterruptedException
 		{
-			for (IntArrayWritable value : values) {
+			/*for (TextArrayWritable value : values) {
 				Integer[] pair = (Integer[]) value.toArray();
 
 				linksToPage.add(new Pair<Integer, Integer>(pair[0], pair[1]));
@@ -191,7 +191,7 @@ public class TopPopularLinks extends Configured implements Tool
 			for (Pair<Integer, Integer> link : linksToPage) {
 				context.write(new IntWritable(link.second), new IntWritable(link.first));
 			}
-
+*/
 		}
 	}
 }
