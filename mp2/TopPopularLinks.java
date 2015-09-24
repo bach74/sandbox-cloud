@@ -89,7 +89,7 @@ public class TopPopularLinks extends Configured implements Tool
 		FileOutputFormat.setOutputPath(jobB, new Path(args[1]));
 
 		jobB.setInputFormatClass(KeyValueTextInputFormat.class);
-		jobB.setOutputFormatClass(TextOutputFormat.class);
+		// jobB.setOutputFormatClass(TextOutputFormat.class);
 
 		jobB.setJarByClass(TopPopularLinks.class);
 
