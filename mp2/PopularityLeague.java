@@ -130,7 +130,7 @@ public class PopularityLeague extends Configured implements Tool
 			for (String s : leagueMembers) {
 				Integer m = Integer.parseInt(s);
 				this.leagueMembers.add(m);
-				LOG.info("added member" + m);
+				LOG.info("added member " + m);
 			}
 		}
 
@@ -143,9 +143,9 @@ public class PopularityLeague extends Configured implements Tool
 			StringTokenizer tokenizer = new StringTokenizer(part[1]);
 			while (tokenizer.hasMoreTokens()) {
 				int link = Integer.parseInt(tokenizer.nextToken().trim());
-				if (leagueMembers.contains(page)) {
+				if (leagueMembers.contains(link)) {
 					context.write(new IntWritable(link), new IntWritable(1));
-					LOG.info("added" + link);
+					LOG.info("##link added" + link);
 				}
 			}
 		}
