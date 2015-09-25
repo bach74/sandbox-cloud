@@ -199,9 +199,14 @@ public class PopularityLeague extends Configured implements Tool
 				linksToPage.add(new Pair<Integer, Integer>(pair[0].get(), pair[1].get()));
 			}
 
-			int i = 1;
+			int rank = 0;
+			int prev = 0;
 			for (Pair<Integer, Integer> link : linksToPage) {
-				context.write(new IntWritable(link.second), new IntWritable(i++));
+				if (link.first > prev) {
+					prev = link.first;
+					rank++;
+				}
+				context.write(new IntWritable(link.second), new IntWritable(rank));
 			}
 
 		}
