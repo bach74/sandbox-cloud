@@ -124,9 +124,10 @@ public class PopularityLeague extends Configured implements Tool
 		protected void setup(Context context) throws IOException, InterruptedException
 		{
 			Configuration conf = context.getConfiguration();
-			String leagueMembers = conf.get("league");
-
-			this.leagueMembers = Arrays.asList(Integer.parseInt(readHDFSFile(leagueMembers, conf).split("\n")));
+			String[] leagueMembers = readHDFSFile(conf.get("league"), conf).split("\n");
+			for (String s : leagueMembers) {
+				this.leagueMembers.add(Integer.parseInt(s));
+			}
 		}
 
 		@Override
