@@ -128,7 +128,9 @@ public class PopularityLeague extends Configured implements Tool
 			Configuration conf = context.getConfiguration();
 			String[] leagueMembers = readHDFSFile(conf.get("league"), conf).split("\n");
 			for (String s : leagueMembers) {
-				this.leagueMembers.add(Integer.parseInt(s));
+				Integer m = Integer.parseInt(s);
+				this.leagueMembers.add(m);
+				LOG.info("added member" + m);
 			}
 		}
 
@@ -143,6 +145,7 @@ public class PopularityLeague extends Configured implements Tool
 				int link = Integer.parseInt(tokenizer.nextToken().trim());
 				if (leagueMembers.contains(page)) {
 					context.write(new IntWritable(link), new IntWritable(1));
+					LOG.info("added" + link);
 				}
 			}
 		}
@@ -193,11 +196,10 @@ public class PopularityLeague extends Configured implements Tool
 		{
 			for (IntArrayWritable value : values) {
 				IntWritable[] pair = (IntWritable[]) value.toArray();
-
 				linksToPage.add(new Pair<Integer, Integer>(pair[0].get(), pair[1].get()));
 			}
 
-			int i = 0;
+			int i = 1;
 			for (Pair<Integer, Integer> link : linksToPage) {
 				context.write(new IntWritable(link.second), new IntWritable(i++));
 			}
