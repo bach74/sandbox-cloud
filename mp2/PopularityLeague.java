@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.Integer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -119,7 +120,7 @@ public class PopularityLeague extends Configured implements Tool
 
 	public static class LinkCountMap extends Mapper<Object, Text, IntWritable, IntWritable>
 	{
-		List<Integer> leagueMembers;
+		List<Integer> leagueMembers = new ArrayList<Integer>();
 
 		@Override
 		protected void setup(Context context) throws IOException, InterruptedException
